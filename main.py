@@ -9,7 +9,7 @@ def getkey(localstate):
 def decryptpw(pw, key):
     return AES.new(key, AES.MODE_GCM, pw[3:15]).decrypt(pw[15:])[:-16].decode(errors="ignore")
 
-def get_unique_filename(folder, base_name):
+def getfilename(folder, base_name):
     os.makedirs(folder, exist_ok=True)
     filename, ext = os.path.splitext(base_name)
     counter = 1
@@ -37,7 +37,7 @@ def menu():
         cur.execute("SELECT origin_url, username_value, password_value FROM logins")
         for url, user, pw in cur.fetchall():
             data.append(f"{url} | {user} | {decryptpw(pw, key)}")
-        filename = get_unique_filename("passwords", "passwords.txt")
+        filename = getfilename("passwords", "passwords.txt")
         with open(filename, "w", encoding="utf-8") as f:
             f.write("\n".join(data))
         conn.close(), os.remove("temp.db")
@@ -54,7 +54,7 @@ def menu():
         cur = conn.cursor()
         cur.execute("SELECT url, title, datetime(last_visit_time/1000000-11644473600, 'unixepoch') FROM urls")
         data = [f"{row[1]} | {row[0]} | Last Visited: {row[2]}" for row in cur.fetchall()]
-        filename = get_unique_filename("history", "history.txt")
+        filename = getfilename("history", "history.txt")
         with open(filename, "w", encoding="utf-8") as f:
             f.write("\n".join(data))
         conn.close(), os.remove("temp.db")
